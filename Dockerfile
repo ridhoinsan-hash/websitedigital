@@ -1,7 +1,9 @@
 FROM php:8.2-apache
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql \
-    && a2enmod rewrite
+# Matikan mpm_event dan mpm_worker secara eksplisit sebelum mengaktifkan rewrite/prefork
+RUN a2dismod mpm_event mpm_worker \
+    && a2enmod mpm_prefork rewrite \
+    && docker-php-ext-install mysqli pdo pdo_mysql
 
 COPY . /var/www/html/
 
