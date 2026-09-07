@@ -8,7 +8,15 @@ COPY . /var/www/html/
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Railway memakai $PORT, bukan selalu 80
-CMD sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf \
-    && sed -i "s/:80/:${PORT}/" /etc/apache2/sites-enabled/000-default.conf \
-    && apache2-foreground
+# Script start agar listen ke $PORT Railway
+RUN printf '%s\n' \
+  '#!/bin/bash' \
+  'set -e' \
+  'PORT="${PORT:-80}"' \
+  'sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf' \
+  'sed -i "s/:80/:${PORT}/" /etc/apache2/sites-available/000-default.conf' \
+  'exec apache2-foreground' \
+  > /usr/local/bin/start.sh \
+  && chmod +x /usr/local/bin/start.sh
+
+CMD ["/usr/local/bin/start.sh"]
