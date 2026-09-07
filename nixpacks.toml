@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = [
+  "php84",
+  "php84Extensions.mysqli",
+  "php84Extensions.gd",
+  "php84Extensions.mbstring",
+  "php84Extensions.openssl",
+  "php84Extensions.session"
+]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT -t ."
