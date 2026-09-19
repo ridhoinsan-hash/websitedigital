@@ -1,16 +1,20 @@
 <?php
 mysqli_report(MYSQLI_REPORT_OFF);
 
-$host     = getenv('MYSQLHOST') ?: 'mysql.railway.internal';
+$host     = getenv('MYSQLHOST') ?: 'altaria.proxy.rlwy.net';
 $user     = getenv('MYSQLUSER') ?: 'root';
 $password = getenv('MYSQLPASSWORD') ?: 'IPUkvcZRPBKoqTqbKyrnkcedxdWUEpmR';
 $database = getenv('MYSQLDATABASE') ?: 'railway';
-$port     = (int)(getenv('MYSQLPORT') ?: 3306);
+$port     = (int)(getenv('MYSQLPORT') ?: 10294);
 
 $conn = @mysqli_connect($host, $user, $password, $database, $port);
 
 if (!$conn) {
-    die('Koneksi gagal: ' . mysqli_connect_error());
+    die(
+        'Koneksi gagal: ' . mysqli_connect_error() .
+        '<br>Host: ' . htmlspecialchars($host) .
+        '<br>Port: ' . $port
+    );
 }
 
 mysqli_set_charset($conn, 'utf8mb4');
