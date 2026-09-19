@@ -5,20 +5,19 @@ $host     = 'mysql.railway.internal';
 $port     = 3306;
 $database = 'railway';
 
-// Coba 1: user = root, password = MYSQL_ROOT_PASSWORD
+// Coba 1
 $user     = 'root';
 $password = 'cDfaLukPyywJKDUKSghJRUQIaNIReVB0';
-
 $conn = @mysqli_connect($host, $user, $password, $database, $port);
 
-// Coba 2: kalau gagal, user = password string, password kosong
+// Coba 2
 if (!$conn) {
     $user     = 'cDfaLukPyywJKDUKSghJRUQIaNIReVB0';
     $password = '';
     $conn = @mysqli_connect($host, $user, $password, $database, $port);
 }
 
-// Coba 3: user root, password kosong
+// Coba 3
 if (!$conn) {
     $user     = 'root';
     $password = '';
@@ -26,11 +25,7 @@ if (!$conn) {
 }
 
 if (!$conn) {
-    die(
-        'Koneksi gagal<br>' .
-        'Host: ' . htmlspecialchars($host) . '<br>' .
-        'Error: ' . htmlspecialchars(mysqli_connect_error())
-    );
+    die('Koneksi gagal: ' . mysqli_connect_error());
 }
 
 mysqli_set_charset($conn, 'utf8mb4');
@@ -71,4 +66,5 @@ function getAllSettings() {
 }
 
 function shopName() {
-    return getSetting('nama_toko', 'Digital 
+    return getSetting('nama_toko', 'Digital Electronic');
+}
