@@ -1,41 +1,35 @@
 <?php
-// Digital Electronic - Konfigurasi Database (Railway)
-// Baca dari MYSQL_URL / MYSQL_ROOT_PASSWORD yang tersedia di service MySQL
+// Digital Electronic - Konfigurasi Database
+// Sementara hardcode dari Railway MySQL (nanti bisa diganti ke env)
 
-$host     = 'localhost';
+$host     = 'mysql.railway.internal';
 $user     = 'root';
-$password = '';
+$password = 'cDfaLukPyywJKDUKSghJRUQIaNIReVB0';
 $database = 'railway';
 $port     = 3306;
 
-// 1. Prioritas: parse MYSQL_URL (paling lengkap)
-$mysqlUrl = getenv('MYSQL_URL') ?: getenv('DATABASE_URL') ?: '';
-if (!empty($mysqlUrl)) {
-    $p = parse_url($mysqlUrl);
-    if ($p !== false) {
+// Kalau env sudah ter-set, utamakan env
+if (getenv('MYSQL_URL')) {
+    $p = parse_url(getenv('MYSQL_URL'));
+    if ($p) {
         $host     = $p['host'] ?? $host;
         $port     = isset($p['port']) ? (int)$p['port'] : $port;
-        $user     = $p['user'] ?? $user;
-        $password = $p['pass'] ?? $password;
+        $user     = !empty($p['user']) ? $p['user'] : $user;
+        $password = !empty($p['pass']) ? $p['pass'] : $password;
         if (!empty($p['path'])) {
             $database = ltrim($p['path'], '/');
         }
     }
 }
 
-// 2. Fallback dari variable terpisah (yang ada di Railway kamu)
-$host     = getenv('MYSQLHOST') ?: getenv('MYSQL_HOST') ?: $host;
-$user     = getenv('MYSQLUSER') ?: getenv('MYSQL_USER') ?: $user;
-$password = getenv('MYSQLPASSWORD') ?: getenv('MYSQL_PASSWORD') ?: getenv('MYSQL_ROOT_PASSWORD') ?: $password;
-$database = getenv('MYSQLDATABASE') ?: getenv('MYSQL_DATABASE') ?: $database;
-$port     = (int)(getenv('MYSQLPORT') ?: getenv('MYSQL_PORT') ?: $port);
-
-// 3. Railway internal biasanya user = root
-if ($user === '' || $user === null) {
-    $user = 'root';
+if (getenv('MYSQL_ROOT_PASSWORD')) {
+    $password = getenv('MYSQL_ROOT_PASSWORD');
 }
-if ($database === '' || $database === null) {
-    $database = 'railway';
+if (getenv('MYSQL_DATABASE')) {
+    $database = getenv('MYSQL_DATABASE');
+}
+if (getenv('MYSQLHOST') || getenv('MYSQL_HOST')) {
+    $host = getenv('MYSQLHOST') ?: getenv('MYSQL_HOST');
 }
 
 $conn = @mysqli_connect($host, $user, $password, $database, $port);
@@ -44,15 +38,11 @@ if (!$conn) {
     http_response_code(500);
     echo "<h2>Koneksi Database Gagal</h2>";
     echo "<pre>";
-    echo "Host     : " . htmlspecialchars((string)$host) . "\n";
-    echo "User     : " . htmlspecialchars((string)$user) . "\n";
-    echo "Database : " . htmlspecialchars((string)$database) . "\n";
+    echo "Host     : " . htmlspecialchars($host) . "\n";
+    echo "User     : " . htmlspecialchars($user) . "\n";
+    echo "Database : " . htmlspecialchars($database) . "\n";
     echo "Port     : " . $port . "\n";
-    echo "Error    : " . mysqli_connect_error() . "\n\n";
-    echo "MYSQL_URL          : " . (getenv('MYSQL_URL') ? '(ada)' : '(kosong)') . "\n";
-    echo "MYSQL_ROOT_PASSWORD: " . (getenv('MYSQL_ROOT_PASSWORD') ? '(ada)' : '(kosong)') . "\n";
-    echo "MYSQL_DATABASE     : " . (getenv('MYSQL_DATABASE') ?: '(kosong)') . "\n";
-    echo "MYSQLHOST          : " . (getenv('MYSQLHOST') ?: '(kosong)') . "\n";
+    echo "Error    : " . mysqli_connect_error() . "\n";
     echo "</pre>";
     exit;
 }
