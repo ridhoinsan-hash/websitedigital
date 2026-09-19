@@ -1,28 +1,13 @@
 <?php
 mysqli_report(MYSQLI_REPORT_OFF);
 
-$host     = 'mysql.railway.internal';
-$port     = 3306;
-$database = 'railway';
+$host     = getenv('MYSQLHOST') ?: 'mysql.railway.internal';
+$user     = getenv('MYSQLUSER') ?: 'root';
+$password = getenv('MYSQLPASSWORD') ?: getenv('MYSQL_ROOT_PASSWORD') ?: 'cDfaLukPyywJKDUKSghJRUQIaNIReVB0';
+$database = getenv('MYSQLDATABASE') ?: getenv('MYSQL_DATABASE') ?: 'railway';
+$port     = (int)(getenv('MYSQLPORT') ?: 3306);
 
-// Coba 1
-$user     = 'root';
-$password = 'cDfaLukPyywJKDUKSghJRUQIaNIReVB0';
 $conn = @mysqli_connect($host, $user, $password, $database, $port);
-
-// Coba 2
-if (!$conn) {
-    $user     = 'cDfaLukPyywJKDUKSghJRUQIaNIReVB0';
-    $password = '';
-    $conn = @mysqli_connect($host, $user, $password, $database, $port);
-}
-
-// Coba 3
-if (!$conn) {
-    $user     = 'root';
-    $password = '';
-    $conn = @mysqli_connect($host, $user, $password, $database, $port);
-}
 
 if (!$conn) {
     die('Koneksi gagal: ' . mysqli_connect_error());
