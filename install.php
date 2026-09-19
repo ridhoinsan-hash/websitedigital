@@ -72,9 +72,10 @@ foreach ($queries as $i => $sql) {
     if (mysqli_query($conn, $sql)) {
         echo ($i + 1) . ". OK<br>";
     } else {
-        echo ($i + 1) . ". ERROR: " . mysqli_error($conn) . "<br>";
+        echo ($i + 1) . ". ERROR: " . htmlspecialchars(mysqli_error($conn)) . "<br>";
     }
 }
-echo "<br><b>Selesai.</b> Hapus file install.php, lalu login: admin / admin123";
+echo "<p><b>Selesai.</b> Hapus file install.php, lalu login:</p>";
+echo "<p>Username: <b>admin</b><br>Password: <b>admin123</b></p>";
 mysqli_close($conn);
 ?>
