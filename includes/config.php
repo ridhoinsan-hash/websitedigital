@@ -3,8 +3,8 @@ mysqli_report(MYSQLI_REPORT_OFF);
 
 $host     = getenv('MYSQLHOST') ?: 'mysql.railway.internal';
 $user     = getenv('MYSQLUSER') ?: 'root';
-$password = getenv('MYSQLPASSWORD') ?: getenv('MYSQL_ROOT_PASSWORD') ?: 'cDfaLukPyywJKDUKSghJRUQIaNIReVB0';
-$database = getenv('MYSQLDATABASE') ?: getenv('MYSQL_DATABASE') ?: 'railway';
+$password = getenv('MYSQLPASSWORD') ?: 'PASSWORD_BARU_DARI_RAILWAY';
+$database = getenv('MYSQLDATABASE') ?: 'railway';
 $port     = (int)(getenv('MYSQLPORT') ?: 3306);
 
 $conn = @mysqli_connect($host, $user, $password, $database, $port);
