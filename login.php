@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/captcha.php';
 
 if (isset($_SESSION['user_id'])) {
     $role = $_SESSION['role'] ?? 'pembeli';
-    header("Location: " . ($role === 'pembeli' ? 'produk.php' : 'index.php'));
+    header("Location: " . ($role === 'pembeli' ? 'dashboard_pembeli.php' : 'index.php'));
     exit;
 }
 
@@ -33,7 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username']      = $user['username'];
             $_SESSION['nama_lengkap']  = $user['nama_lengkap'];
             $_SESSION['role']          = $user['role'];
-            header("Location: " . ($user['role'] === 'pembeli' ? 'produk.php' : 'index.php'));
+
+            // Pembeli → dashboard pelanggan | Admin/kasir/staff → index
+            if ($user['role'] === 'pembeli') {
+                header("Location: dashboard_pembeli.php");
+            } else {
+                header("Location: index.php");
+            }
             exit;
         } else {
             $error = 'Username atau password salah!';
@@ -50,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - Digital Electronic</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             min-height: 100vh;
             display: flex;
@@ -61,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             overflow: hidden;
             position: relative;
         }
-
         .bg-glow {
             position: absolute;
             inset: 0;
@@ -71,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 radial-gradient(ellipse 60% 45% at 90% 15%, rgba(59, 130, 246, 0.2), transparent 55%),
                 radial-gradient(ellipse 40% 30% at 50% 50%, rgba(139, 92, 246, 0.08), transparent);
         }
-
         .login-ring {
             position: relative;
             z-index: 1;
@@ -84,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 0 0 30px rgba(168, 85, 247, 0.35),
                 0 0 60px rgba(59, 130, 246, 0.15);
         }
-
         .login-inner {
             width: 100%;
             height: 100%;
@@ -97,7 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 9% 12% 8%;
             text-align: center;
         }
-
         .brand {
             font-size: 0.62rem;
             font-weight: 600;
@@ -106,20 +107,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #c4b5fd;
             margin-bottom: 4px;
         }
-
         h1 {
             font-size: 1.55rem;
             font-weight: 700;
             color: #ffffff;
             margin-bottom: 2px;
         }
-
         .subtitle {
             font-size: 0.75rem;
             color: #94a3b8;
             margin-bottom: 12px;
         }
-
         .alert {
             width: 100%;
             padding: 8px 12px;
@@ -131,9 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #fca5a5;
             text-align: left;
         }
-
         form { width: 100%; }
-
         .field {
             display: flex;
             align-items: center;
@@ -146,19 +142,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 8px;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-
         .field:focus-within {
             border-color: rgba(168, 85, 247, 0.65);
             box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
         }
-
         .field .icon {
             color: #94a3b8;
             font-size: 0.9rem;
             flex-shrink: 0;
             line-height: 1;
         }
-
         .field input {
             flex: 1;
             min-width: 0;
@@ -172,9 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             -webkit-appearance: none;
             appearance: none;
         }
-
         .field input::placeholder { color: #64748b; }
-
         .field input:-webkit-autofill,
         .field input:-webkit-autofill:hover,
         .field input:-webkit-autofill:focus {
@@ -182,7 +173,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             -webkit-box-shadow: 0 0 0 40px #1a1a28 inset !important;
             transition: background-color 9999s ease-in-out 0s;
         }
-
         .captcha-row {
             display: flex;
             align-items: center;
@@ -190,7 +180,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
             margin-bottom: 8px;
         }
-
         .captcha-row img {
             height: 38px;
             width: auto;
@@ -200,7 +189,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #1e1b4b;
             flex-shrink: 0;
         }
-
         .captcha-row .btn-refresh {
             width: 38px;
             height: 38px;
@@ -216,17 +204,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 1rem;
             padding: 0;
         }
-
         .captcha-row .btn-refresh:hover {
             background: rgba(255, 255, 255, 0.14);
         }
-
         .captcha-row .field {
             flex: 1;
             margin-bottom: 0;
             padding: 10px 14px;
         }
-
         .opts {
             display: flex;
             justify-content: space-between;
@@ -236,7 +221,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.68rem;
             color: #94a3b8;
         }
-
         .opts label {
             display: flex;
             align-items: center;
@@ -244,10 +228,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
             user-select: none;
         }
-
         .opts input[type="checkbox"] { accent-color: #a855f7; }
-        .opts span.forgot { opacity: 0.55; cursor: default; }
-
+        .opts a.forgot {
+            color: #f472b6;
+            text-decoration: none;
+            font-weight: 600;
+            opacity: 1;
+        }
+        .opts a.forgot:hover { text-decoration: underline; }
         .btn-login {
             width: 100%;
             padding: 10px 18px;
@@ -262,58 +250,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-family: inherit;
             transition: transform 0.15s, box-shadow 0.15s;
         }
-
         .btn-login:hover {
             transform: translateY(-1px);
             box-shadow: 0 6px 24px rgba(168, 85, 247, 0.55);
         }
-
-        .divider {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 10px 0 4px;
-            color: #64748b;
-            font-size: 0.62rem;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .demo {
-            font-size: 0.6rem;
-            color: #64748b;
-            line-height: 1.4;
-            padding: 0 4px;
-            word-break: break-word;
-        }
-
-        .demo strong {
-            color: #c4b5fd;
-            font-weight: 600;
-        }
-
         .signup {
             margin-top: 8px;
             font-size: 0.72rem;
             color: #94a3b8;
             padding-bottom: 2px;
         }
-
         .signup a {
             color: #f472b6;
             font-weight: 600;
             text-decoration: none;
         }
-
         .signup a:hover { text-decoration: underline; }
-
         @media (max-width: 440px) {
             .login-ring {
                 aspect-ratio: auto;
@@ -368,7 +320,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label>
                         <input type="checkbox" name="remember" value="1"> Remember me
                     </label>
-                    <span class="forgot">Forgot password?</span>
+                    <a href="lupa_password.php" class="forgot">Lupa password?</a>
                 </div>
 
                 <button type="submit" class="btn-login">Login →</button>
